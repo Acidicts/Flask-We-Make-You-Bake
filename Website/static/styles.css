@@ -1,6 +1,7 @@
 h1 {
     color: darkgoldenrod;
     font-size: 3em;
+    height: 2em;
     background: aqua;
     border-radius: 10px;
     text-align: center;
@@ -52,4 +53,21 @@ p {
 
 .spacer-50 {
     height: 50px;
+}
+
+.sign-up-container {
+    background: aqua;
+    border-radius: 10px;
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center-align the items horizontally */
+    padding: 20px; /* Add some padding around the elements */
+}
+
+.sign-up-container input,
+.sign-up-container button {
+    width: 90%; /* Set the width of inputs and button */
+    margin: 10px 0; /* Add top and bottom margin for spacing */
 }
