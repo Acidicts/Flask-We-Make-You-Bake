@@ -1,6 +1,8 @@
 from flask import Flask
 from .extensions import db
 from .auth import auth as auth_blueprint, generate_password_hash
+from .views import views
+
 
 def create_app():
     app = Flask(__name__)
@@ -15,10 +17,6 @@ def create_app():
         db.create_all()  # Create tables if they don't exist
 
     app.register_blueprint(auth_blueprint)
+    app.register_blueprint(views)
 
     return app
-
-def run_app(app):
-    app = create_app()
-    app.run(debug=True, host='0.0.0.0', port=5000)
-

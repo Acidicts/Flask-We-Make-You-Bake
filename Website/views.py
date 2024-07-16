@@ -1,6 +1,7 @@
-from . import app
+from flask import render_template, Blueprint
 
+views = Blueprint('views', __name__)
 
-@app.route('/')
+@views.route('/')
 def home():
-    render_template('index.html')
+    return render_template('index.html')
