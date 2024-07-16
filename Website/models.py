@@ -2,25 +2,20 @@ from . import db
 from flask_login import UserMixin
 from .extensions import db
 
-class User(db.Model):
+class Recipe(db.Model):
+    __tablename__ = 'recipe'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(300), nullable=False)
+    ingredients = db.Column(db.String(500), nullable=False)
+    instructions = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+class User(db.Model, UserMixin):
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(80), nullable=False)
-    firstName = db.Column(db.String(30), nullable=True)  # Ensure this matches how it's used
-    lastName = db.Column(db.String(30), nullable=True)
-    is_authenticated = db.Column(db.Boolean, default=True)
-    is_active = db.Column(db.Boolean, default=True)
-
-    def get_id(self):
-        """
-        Return the email address to satisfy Flask-Login's requirements.
-        """
-        return self.id
-
-# Recipe model for recipes.db
-class Recipe(db.Model):
-    __bind_key__ = 'recipes'
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-
+    firstName = db.Column(db.String(100), nullable=False)
+    lastName = db.Column(db.String(100), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    recipes = db.relationship('Recipe', backref='user', lazy=True)
