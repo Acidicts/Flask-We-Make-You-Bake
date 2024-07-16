@@ -1,10 +1,9 @@
-from .models import User  # Import the User model
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from flask import Flask, request, jsonify, render_template, Blueprint, flash, redirect
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import login_user, current_user, login_required, logout_user
+from flask import Blueprint, request, flash, redirect, url_for, render_template
+from werkzeug.security import check_password_hash, generate_password_hash
+from .models import User
 from . import db
-
-# The rest of your auth.py code remains unchanged
+import re
 
 auth = Blueprint('auth', __name__)
 
@@ -16,15 +15,12 @@ def login():
         password = request.form.get("password")
         user = User.query.filter_by(email=email).first()
 
-        if user:
-            if check_password_hash(user.password, password):
-                flash("Logged in successfully!", category="success")
-                login_user(user, remember=True)
-                return redirect(url_for("views.home"))
-            else:
-                flash("Incorrect password, try again.", category="error")
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            flash("Logged in successfully!", category="success")
+            return redirect(url_for('views.home'))
         else:
-            flash("Email does not exist.", category="error")
+            flash("Incorrect email or password, try again.", category="error")
 
     return render_template("login.html", user=current_user)
 
@@ -46,24 +42,28 @@ def sign_up():
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
 
-        user = User.query.filter_by(email=email).first()
-        if user:
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            flash("Invalid email address.", category="error")
+            return render_template("sign_up.html", user=current_user)
+
+        if User.query.filter_by(email=email).first():
             flash("Email already exists.", category="error")
-        elif len(email) < 4:
-            flash("Email must be greater than 4 characters.", category="error")
-        elif len(firstName) < 2:
-            flash("First Name must be greater than 2 characters.", category="error")
-        elif len(lastName) < 2:
-            flash("Last Name must be greater than 2 characters.", category="error")
+        elif len(firstName) < 2 or len(lastName) < 2:
+            flash("Name must be more than 1 character.", category="error")
         elif password1 != password2:
             flash("Passwords don't match.", category="error")
         elif len(password1) < 7:
             flash("Password must be at least 7 characters.", category="error")
         else:
-            new_user = User(email=email, firstName=firstName, lastName=lastName,
-                            password=generate_password_hash(password1, method="pbkdf2:sha256"))
-            db.session.add(new_user)
-            db.session.commit()
-            flash("Account created!", category="success")
-            return redirect("/login")
+            try:
+                new_user = User(email=email, firstName=firstName, lastName=lastName,
+                                password=generate_password_hash(password1, method="pbkdf2:sha256"))
+                db.session.add(new_user)
+                db.session.commit()
+                flash("Account created! Please log in.", category="success")
+                return redirect(url_for("auth.login"))
+            except Exception as e:
+                flash("An error occurred. Please try again.", category="error")
+                print(e)  # For debugging purposes, consider logging this instead
+
     return render_template("sign_up.html", user=current_user)
