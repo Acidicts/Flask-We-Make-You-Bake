@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "we make you bake"
+version = "0.1.0"
+description = ""
+authors = ["Acidicts <111660544+Acidicts@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+flask = "^3.0.3"
+flask-login = "^0.6.3"
+flask-migrate = "^4.0.7"
+flask-sqlalchemy = "^3.1.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
