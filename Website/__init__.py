@@ -1,11 +1,13 @@
 from flask import Flask
 from .extensions import db
 from .models import User, Recipe
+from .views import views as views_blueprint
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from .auth import auth as auth_blueprint
 from .recipes import recipes as recipes_blueprint
 import os
+
 
 def create_app():
     app = Flask(__name__)
@@ -31,6 +33,7 @@ def create_app():
 
     app.register_blueprint(auth_blueprint)
     app.register_blueprint(recipes_blueprint)
+    app.register_blueprint(views_blueprint)
 
     @login_manager.user_loader
     def load_user(user_id):
